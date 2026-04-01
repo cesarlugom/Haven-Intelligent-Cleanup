@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haven — Intelligent Cleanup for Windows</title>
+  <meta name="description" content="Haven scans your PC and cloud storage together — OneDrive, iCloud, Dropbox, Google Drive. Find what's wasting space and clean up confidently. Free on Microsoft Store.">
+  <meta name="keywords" content="file cleanup, disk cleaner, duplicate finder, file organizer, junk cleaner, space recovery, OneDrive, iCloud, Dropbox, Windows, Microsoft Store">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Haven — Intelligent Cleanup for Windows">
+  <meta property="og:description" content="Haven scans your PC and cloud storage together. Find forgotten files, duplicates, and junk — clean up confidently. 100% private.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cesarlugom.github.io/haven/">
+  <meta property="og:image" content="https://cesarlugom.github.io/haven/og-image.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Haven — Intelligent Cleanup for Windows">
+  <meta name="twitter:description" content="Scan your PC and cloud storage together. Find forgotten files, duplicates, and junk. 100% private, no cloud uploads.">
+  <meta name="twitter:image" content="https://cesarlugom.github.io/haven/og-image.png">
+
+  <link rel="icon" type="image/png" href="haven-logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #060B11;
+      --bg-raised: #0C1319;
+      --bg-card: #111B24;
+      --bg-card-hover: #162330;
+      --accent: #2196F3;
+      --accent-dim: rgba(33, 150, 243, 0.10);
+      --accent-border: rgba(33, 150, 243, 0.22);
+      --accent-glow: rgba(33, 150, 243, 0.35);
+      --teal: #4ECDC4;
+      --teal-dim: rgba(78, 205, 196, 0.08);
+      --gold: #FFB300;
+      --text-1: #EAF0F6;
+      --text-2: #8A9BB0;
+      --text-3: #4D6070;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .ambient {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 800px 500px at 20% 0%, rgba(33, 150, 243, 0.07), transparent),
+        radial-gradient(ellipse 600px 400px at 80% 100%, rgba(78, 205, 196, 0.04), transparent);
+    }
+
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 14px 0;
+      background: rgba(6, 11, 17, 0.88);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .wrap { display: flex; align-items: center; justify-content: space-between; }
+
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-1); }
+    .nav-brand img { width: 32px; height: 32px; border-radius: 8px; }
+    .nav-brand span { font-weight: 700; font-size: 17px; letter-spacing: -0.02em; }
+
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: var(--text-2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text-1); }
+
+    .lang-toggle {
+      display: inline-flex; align-items: center; gap: 0;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+      overflow: hidden; font-size: 12px; font-weight: 600;
+    }
+    .lang-toggle button {
+      padding: 5px 12px; border: none; background: transparent;
+      color: var(--text-3); cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 600;
+      transition: all 0.2s;
+    }
+    .lang-toggle button.active { background: var(--accent); color: #fff; }
+
+    .btn-store {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 20px; background: var(--accent); color: #fff;
+      border-radius: 8px; font-weight: 600; font-size: 13px;
+      text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-store:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+    .btn-store svg { width: 14px; height: 14px; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 150px 0 60px; text-align: center;
+      background: linear-gradient(180deg, rgba(33, 150, 243, 0.05) 0%, transparent 60%);
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; background: var(--accent-dim);
+      border: 1px solid var(--accent-border); border-radius: 100px;
+      font-size: 13px; color: var(--accent); font-weight: 500; margin-bottom: 28px;
+    }
+    .badge .pulse { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+    h1 {
+      font-size: clamp(36px, 5.5vw, 58px); font-weight: 800;
+      line-height: 1.08; letter-spacing: -0.04em; margin-bottom: 22px;
+    }
+    h1 .grad {
+      background: linear-gradient(135deg, var(--accent), var(--teal));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 17px; color: var(--text-2); max-width: 560px;
+      margin: 0 auto 36px; line-height: 1.7; font-weight: 400;
+    }
+
+    .hero-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+
+    .btn-big {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 15px 34px; background: var(--accent); color: #fff; border: none;
+      border-radius: 10px; font-size: 15px; font-weight: 600; font-family: inherit;
+      cursor: pointer; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-big:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--accent-glow); }
+    .btn-big svg { width: 18px; height: 18px; }
+
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 15px 26px; background: transparent; color: var(--text-2);
+      border: 1px solid var(--border-hover); border-radius: 10px;
+      font-size: 15px; font-weight: 500; font-family: inherit;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--text-3); color: var(--text-1); }
+
+    .hero-note { font-size: 13px; color: var(--text-3); }
+
+    /* ── CLOUD PROVIDERS ── */
+    .providers {
+      padding: 30px 0 60px; text-align: center;
+    }
+    .providers-label { font-size: 13px; color: var(--text-3); margin-bottom: 18px; font-weight: 500; }
+    .providers-row {
+      display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;
+      font-size: 14px; color: var(--text-2); font-weight: 500;
+    }
+    .providers-row span { display: flex; align-items: center; gap: 6px; opacity: 0.7; }
+
+    /* ── SCREENSHOT ── */
+    .screenshot-section { padding: 0 0 80px; }
+    .screenshot-frame {
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--border-hover);
+      box-shadow: 0 8px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+      background: var(--bg-raised);
+    }
+    .screenshot-frame img { width: 100%; height: auto; display: block; }
+
+    .screenshot-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-top: 14px;
+    }
+    .screenshot-card {
+      border-radius: 10px; overflow: hidden; border: 1px solid var(--border);
+      background: var(--bg-raised); cursor: pointer; transition: border-color 0.3s, transform 0.3s;
+    }
+    .screenshot-card:hover { border-color: var(--accent-border); transform: translateY(-2px); }
+    .screenshot-card img { width: 100%; height: auto; display: block; }
+    .screenshot-card .cap {
+      padding: 10px 14px; font-size: 12px; font-weight: 500;
+      color: var(--text-3); border-top: 1px solid var(--border);
+    }
+
+    /* ── SECTIONS ── */
+    .sec-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+    }
+    .sec-title {
+      font-size: clamp(26px, 3.5vw, 38px); font-weight: 700;
+      letter-spacing: -0.025em; margin-bottom: 48px; line-height: 1.15;
+    }
+
+    /* ── FEATURES ── */
+    .features { padding: 80px 0; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    .fcard {
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px 24px;
+      transition: border-color 0.3s, transform 0.3s, background 0.3s;
+    }
+    .fcard:hover { border-color: var(--accent-border); transform: translateY(-2px); background: var(--bg-card); }
+
+    .fcard-icon {
+      width: 40px; height: 40px; background: var(--accent-dim);
+      border: 1px solid var(--accent-border); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px; font-size: 18px;
+    }
+    .fcard h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em; }
+    .fcard p { font-size: 14px; color: var(--text-2); line-height: 1.65; }
+
+    /* ── HOW IT WORKS ── */
+    .how { padding: 80px 0; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .step-n {
+      font-family: 'IBM Plex Mono', monospace; font-size: 44px; font-weight: 500;
+      line-height: 1; margin-bottom: 14px;
+      -webkit-text-stroke: 1px rgba(33, 150, 243, 0.3); color: transparent;
+    }
+    .step h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .step p { font-size: 14px; color: var(--text-2); line-height: 1.65; }
+
+    /* ── PRIVACY ── */
+    .priv { padding: 80px 0; }
+    .priv-card {
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: 16px; padding: 52px 56px;
+      display: flex; gap: 40px; align-items: center;
+    }
+    .priv-shield { flex-shrink: 0; width: 72px; height: 72px; }
+    .priv-shield img { width: 100%; height: 100%; object-fit: contain; }
+    .priv-body h2 { font-size: 26px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em; }
+    .priv-body p { font-size: 15px; color: var(--text-2); line-height: 1.7; max-width: 500px; }
+    .priv-tags { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+    .priv-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; background: var(--accent-dim);
+      border: 1px solid var(--accent-border); border-radius: 100px;
+      font-size: 12px; font-weight: 500; color: var(--accent);
+    }
+
+    /* ── PRICING ── */
+    .pricing { padding: 80px 0; }
+    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 700px; margin: 0 auto; }
+
+    .pcard {
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: 14px; padding: 32px 28px;
+    }
+    .pcard.pro {
+      border-color: var(--accent); position: relative;
+      background: linear-gradient(180deg, rgba(33,150,243,0.06) 0%, var(--bg-raised) 100%);
+    }
+    .pcard.pro::before {
+      content: attr(data-label); position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+      padding: 3px 14px; background: var(--accent); color: #fff;
+      font-size: 11px; font-weight: 700; border-radius: 100px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+
+    .pcard-tier {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 10px;
+    }
+    .pcard-price { font-size: 34px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 4px; }
+    .pcard-price small { font-size: 14px; font-weight: 400; color: var(--text-3); }
+    .pcard-desc { font-size: 13px; color: var(--text-2); margin-bottom: 22px; }
+    .pcard-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .pcard-list li {
+      font-size: 13px; color: var(--text-2); display: flex; align-items: flex-start; gap: 8px;
+    }
+    .pcard-list li::before { content: '\2713'; color: var(--accent); font-weight: 700; flex-shrink: 0; font-size: 12px; margin-top: 1px; }
+
+    /* ── CTA ── */
+    .final-cta { padding: 100px 0 80px; text-align: center; }
+    .final-cta h2 { font-size: clamp(26px, 3.5vw, 38px); font-weight: 700; letter-spacing: -0.025em; margin-bottom: 14px; }
+    .final-cta p { font-size: 16px; color: var(--text-2); margin-bottom: 28px; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px 0; border-top: 1px solid var(--border);
+    }
+    footer .wrap { display: flex; justify-content: space-between; align-items: center; }
+    .foot-left { font-size: 13px; color: var(--text-3); }
+    .foot-links { display: flex; gap: 24px; }
+    .foot-links a { font-size: 13px; color: var(--text-3); text-decoration: none; transition: color 0.2s; }
+    .foot-links a:hover { color: var(--text-2); }
+
+    /* ── LIGHTBOX ── */
+    .lb { display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; cursor:pointer; padding:40px; }
+    .lb.on { display:flex; }
+    .lb img { max-width:100%; max-height:90vh; border-radius:12px; box-shadow:0 20px 80px rgba(0,0,0,0.6); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .features-grid, .steps, .pricing-grid { grid-template-columns: 1fr; }
+      .screenshot-grid { grid-template-columns: 1fr; }
+      .priv-card { flex-direction: column; padding: 36px 28px; gap: 20px; text-align: center; }
+      .priv-tags { justify-content: center; }
+      .nav-links a:not(.btn-store):not(.lang-toggle) { display: none; }
+      footer .wrap { flex-direction: column; gap: 14px; text-align: center; }
+      .hero { padding: 120px 0 48px; }
+      .providers-row { gap: 16px; }
+    }
+
+    /* ── REVEAL ── */
+    @media (prefers-reduced-motion: no-preference) {
+      .rv { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+      .rv.vis { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── LANG HIDE ── */
+    [data-lang="es"] { display: none; }
+    body.es [data-lang="en"] { display: none; }
+    body.es [data-lang="es"] { display: revert; }
+  </style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<!-- ═══════ NAV ═══════ -->
+<nav>
+  <div class="wrap">
+    <a href="#" class="nav-brand">
+      <img src="haven-logo.png" alt="Haven">
+      <span>Haven</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" data-lang="en">Features</a>
+      <a href="#features" data-lang="es">Funciones</a>
+      <a href="#pricing" data-lang="en">Pricing</a>
+      <a href="#pricing" data-lang="es">Precios</a>
+      <a href="https://cesarlugom.github.io/haven-software-legal/" target="_blank" rel="noopener" data-lang="en">Privacy</a>
+      <a href="https://cesarlugom.github.io/haven-software-legal/" target="_blank" rel="noopener" data-lang="es">Privacidad</a>
+      <div class="lang-toggle">
+        <button class="active" onclick="setLang('en')">EN</button>
+        <button onclick="setLang('es')">ES</button>
+      </div>
+      <a href="https://apps.microsoft.com/detail/9N0VZX057KW4" target="_blank" rel="noopener" class="btn-store">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h6.5v6.5H1V1zm7.5 0H15v6.5H8.5V1zM1 8.5h6.5V15H1V8.5zm7.5 0H15V15H8.5V8.5z"/></svg>
+        <span data-lang="en">Get it Free</span>
+        <span data-lang="es">Descargar</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="badge"><span class="pulse"></span> <span data-lang="en">Live on Microsoft Store</span><span data-lang="es">Disponible en Microsoft Store</span></div>
+
+    <h1 data-lang="en">Stop guessing.<br>Clean up <span class="grad">with confidence</span></h1>
+    <h1 data-lang="es">Deja de adivinar.<br>Limpia <span class="grad">con confianza</span></h1>
+
+    <p class="hero-sub" data-lang="en">Haven scans your PC and cloud storage together — OneDrive, iCloud, Dropbox, Google Drive. It finds what's wasting space so you can clean up without fear of deleting something important.</p>
+    <p class="hero-sub" data-lang="es">Haven escanea tu PC y tu nube juntos — OneDrive, iCloud, Dropbox, Google Drive. Encuentra lo que ocupa espacio de más para que limpies sin miedo a borrar algo importante.</p>
+
+    <div class="hero-buttons">
+      <a href="https://apps.microsoft.com/detail/9N0VZX057KW4" class="btn-big" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h6.5v6.5H1V1zm7.5 0H15v6.5H8.5V1zM1 8.5h6.5V15H1V8.5zm7.5 0H15V15H8.5V8.5z"/></svg>
+        <span data-lang="en">Download Free from Microsoft Store</span>
+        <span data-lang="es">Descargar Gratis de Microsoft Store</span>
+      </a>
+      <a href="#features" class="btn-outline">
+        <span data-lang="en">How it works ↓</span>
+        <span data-lang="es">Cómo funciona ↓</span>
+      </a>
+    </div>
+
+    <p class="hero-note" data-lang="en">Windows 10 & 11 · Free: 3 trial scans · No account needed</p>
+    <p class="hero-note" data-lang="es">Windows 10 y 11 · Gratis: 3 escaneos de prueba · Sin cuenta necesaria</p>
+  </div>
+</section>
+
+<!-- ═══════ CLOUD PROVIDERS ═══════ -->
+<section class="providers">
+  <div class="wrap">
+    <p class="providers-label" data-lang="en">Works safely with your cloud storage</p>
+    <p class="providers-label" data-lang="es">Funciona de forma segura con tu nube</p>
+    <div class="providers-row">
+      <span>☁ OneDrive</span>
+      <span>☁ iCloud</span>
+      <span>☁ Dropbox</span>
+      <span>☁ Google Drive</span>
+      <span>☁ Box</span>
+      <span>☁ pCloud</span>
+      <span>☁ MEGA</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SCREENSHOT ═══════ -->
+<section class="screenshot-section">
+  <div class="wrap">
+    <div class="screenshot-frame rv">
+      <img src="screenshot-dashboard.png" alt="Haven dashboard showing recoverable space" loading="eager">
+    </div>
+    <div class="screenshot-grid">
+      <div class="screenshot-card rv" onclick="openLB('screenshot-discovery.png')">
+        <img src="screenshot-discovery.png" alt="File Discovery view" loading="lazy">
+        <div class="cap" data-lang="en">Files sorted into Safe, Review, and Clean</div>
+        <div class="cap" data-lang="es">Archivos ordenados en Seguro, Revisar y Limpiar</div>
+      </div>
+      <div class="screenshot-card rv" onclick="openLB('screenshot-duplicates.png')">
+        <img src="screenshot-duplicates.png" alt="Duplicate File Finder" loading="lazy">
+        <div class="cap" data-lang="en">Find and remove duplicate files instantly</div>
+        <div class="cap" data-lang="es">Encuentra y elimina duplicados al instante</div>
+      </div>
+      <div class="screenshot-card rv" onclick="openLB('screenshot-recovery.png')">
+        <img src="screenshot-recovery.png" alt="Recovery Center" loading="lazy">
+        <div class="cap" data-lang="en">Deleted something? Restore it in one click</div>
+        <div class="cap" data-lang="es">¿Borraste algo? Restáuralo con un clic</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FEATURES ═══════ -->
+<section class="features" id="features">
+  <div class="wrap">
+    <p class="sec-label" data-lang="en">Features</p>
+    <p class="sec-label" data-lang="es">Funciones</p>
+
+    <h2 class="sec-title" data-lang="en">Everything you need to reclaim your space</h2>
+    <h2 class="sec-title" data-lang="es">Todo lo que necesitas para recuperar tu espacio</h2>
+
+    <div class="features-grid">
+      <div class="fcard rv">
+        <div class="fcard-icon">🔍</div>
+        <h3 data-lang="en">Find What's Wasting Space</h3>
+        <h3 data-lang="es">Encuentra Qué Ocupa Espacio</h3>
+        <p data-lang="en">Haven goes through your folders and groups files by type: old installers, media, documents, system junk. You see exactly which files are the biggest and oldest.</p>
+        <p data-lang="es">Haven revisa tus carpetas y agrupa archivos por tipo: instaladores viejos, medios, documentos, basura del sistema. Ves exactamente cuáles son los más grandes y viejos.</p>
+      </div>
+
+      <div class="fcard rv">
+        <div class="fcard-icon">☁️</div>
+        <h3 data-lang="en">Works With Your Cloud</h3>
+        <h3 data-lang="es">Funciona Con Tu Nube</h3>
+        <p data-lang="en">Automatically finds your OneDrive, iCloud, Dropbox, Google Drive, Box, pCloud, and MEGA folders. Scans them safely — never downloads files stored only in the cloud.</p>
+        <p data-lang="es">Encuentra automáticamente tus carpetas de OneDrive, iCloud, Dropbox, Google Drive, Box, pCloud y MEGA. Las escanea de forma segura — nunca descarga archivos que solo están en la nube.</p>
+      </div>
+
+      <div class="fcard rv">
+        <div class="fcard-icon">📋</div>
+        <h3 data-lang="en">Find Duplicate Files</h3>
+        <h3 data-lang="es">Encuentra Duplicados</h3>
+        <p data-lang="en">Compares files by actual content, not just names. Even detects duplicate folders. Choose what to keep: newest, oldest, cloud copy, or local copy.</p>
+        <p data-lang="es">Compara archivos por contenido real, no solo por nombre. Incluso detecta carpetas duplicadas. Elige qué conservar: más reciente, más antiguo, copia en nube o local.</p>
+      </div>
+
+      <div class="fcard rv">
+        <div class="fcard-icon">🛡️</div>
+        <h3 data-lang="en">Recovery Center</h3>
+        <h3 data-lang="es">Centro de Recuperación</h3>
+        <p data-lang="en">Nothing is permanently deleted. Cleaned files are kept safe for 30 days. Restore any file — or an entire folder — back to its original location with one click.</p>
+        <p data-lang="es">Nada se elimina permanentemente. Los archivos limpiados se guardan 30 días. Restaura cualquier archivo — o carpeta completa — a su ubicación original con un clic.</p>
+      </div>
+
+      <div class="fcard rv">
+        <div class="fcard-icon">⏰</div>
+        <h3 data-lang="en">Automatic Scans</h3>
+        <h3 data-lang="es">Escaneos Automáticos</h3>
+        <p data-lang="en">Set Haven to scan weekly or monthly in the background. It notifies you when it finds files worth reviewing. Stay on top of your storage without thinking about it.</p>
+        <p data-lang="es">Configura escaneos semanales o mensuales en segundo plano. Te avisa cuando encuentra archivos que vale la pena revisar. Mantén tu almacenamiento en orden sin pensarlo.</p>
+      </div>
+
+      <div class="fcard rv">
+        <div class="fcard-icon">🔒</div>
+        <h3 data-lang="en">100% Private</h3>
+        <h3 data-lang="es">100% Privado</h3>
+        <p data-lang="en">Haven works entirely on your PC. No files uploaded anywhere. No accounts, no tracking, no internet required. Your files never leave your machine.</p>
+        <p data-lang="es">Haven funciona completamente en tu PC. No sube archivos a ningún lado. Sin cuentas, sin rastreo, sin internet necesario. Tus archivos nunca salen de tu máquina.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ HOW IT WORKS ═══════ -->
+<section class="how">
+  <div class="wrap">
+    <p class="sec-label" data-lang="en">How it works</p>
+    <p class="sec-label" data-lang="es">Cómo funciona</p>
+
+    <h2 class="sec-title" data-lang="en">Three steps to a cleaner PC</h2>
+    <h2 class="sec-title" data-lang="es">Tres pasos para una PC más limpia</h2>
+
+    <div class="steps">
+      <div class="step rv">
+        <div class="step-n">01</div>
+        <h3 data-lang="en">Scan</h3>
+        <h3 data-lang="es">Escanea</h3>
+        <p data-lang="en">Hit the scan button. Haven analyzes your files in seconds — size, age, type, and location. It even checks your cloud folders without downloading anything.</p>
+        <p data-lang="es">Presiona el botón de escaneo. Haven analiza tus archivos en segundos — tamaño, antigüedad, tipo y ubicación. Incluso revisa tus carpetas en la nube sin descargar nada.</p>
+      </div>
+      <div class="step rv">
+        <div class="step-n">02</div>
+        <h3 data-lang="en">Review</h3>
+        <h3 data-lang="es">Revisa</h3>
+        <p data-lang="en">Your files are sorted into three columns: Safe to Clean, Needs Review, and Your Files. Haven tells you what's safe — you make the final call.</p>
+        <p data-lang="es">Tus archivos se ordenan en tres columnas: Seguro para Limpiar, Necesita Revisión y Tus Archivos. Haven te dice qué es seguro — tú tomas la decisión final.</p>
+      </div>
+      <div class="step rv">
+        <div class="step-n">03</div>
+        <h3 data-lang="en">Clean & Recover</h3>
+        <h3 data-lang="es">Limpia y Recupera</h3>
+        <p data-lang="en">Move files to the Recovery Center. They're kept safe for 30 days. Changed your mind? Restore anything instantly — even entire folders.</p>
+        <p data-lang="es">Mueve archivos al Centro de Recuperación. Se guardan seguros por 30 días. ¿Cambiaste de opinión? Restaura cualquier cosa al instante — incluso carpetas completas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ PRIVACY ═══════ -->
+<section class="priv">
+  <div class="wrap">
+    <div class="priv-card rv">
+      <div class="priv-shield">
+        <img src="haven-logo.png" alt="Haven shield">
+      </div>
+      <div class="priv-body">
+        <h2 data-lang="en">Your files stay yours</h2>
+        <h2 data-lang="es">Tus archivos son tuyos</h2>
+        <p data-lang="en">Haven makes zero network calls except for Microsoft Store license checks. No analytics, no tracking, no cloud sync. Everything stays on your PC.</p>
+        <p data-lang="es">Haven no hace llamadas de red excepto para verificar la licencia de Microsoft Store. Sin análisis, sin rastreo, sin sincronización. Todo se queda en tu PC.</p>
+        <div class="priv-tags">
+          <span class="priv-tag" data-lang="en">No telemetry</span>
+          <span class="priv-tag" data-lang="es">Sin telemetría</span>
+          <span class="priv-tag" data-lang="en">No cloud upload</span>
+          <span class="priv-tag" data-lang="es">Sin subidas</span>
+          <span class="priv-tag" data-lang="en">No account</span>
+          <span class="priv-tag" data-lang="es">Sin cuenta</span>
+          <span class="priv-tag" data-lang="en">Works offline</span>
+          <span class="priv-tag" data-lang="es">Funciona offline</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ PRICING ═══════ -->
+<section class="pricing" id="pricing">
+  <div class="wrap" style="text-align:center">
+    <p class="sec-label" data-lang="en">Pricing</p>
+    <p class="sec-label" data-lang="es">Precios</p>
+    <h2 class="sec-title" data-lang="en">One price. Forever yours.</h2>
+    <h2 class="sec-title" data-lang="es">Un precio. Para siempre.</h2>
+
+    <div class="pricing-grid" style="text-align:left">
+      <div class="pcard rv">
+        <div class="pcard-tier">Free</div>
+        <div class="pcard-price">$0</div>
+        <p class="pcard-desc" data-lang="en">No account needed</p>
+        <p class="pcard-desc" data-lang="es">Sin cuenta necesaria</p>
+        <ul class="pcard-list">
+          <li data-lang="en">3 trial scans</li>
+          <li data-lang="es">3 escaneos de prueba</li>
+          <li data-lang="en">Downloads &amp; Temp folders</li>
+          <li data-lang="es">Carpetas de Descargas y Temporales</li>
+          <li data-lang="en">Visual file organization</li>
+          <li data-lang="es">Organización visual de archivos</li>
+          <li data-lang="en">Recovery Center — 30-day safety net</li>
+          <li data-lang="es">Centro de Recuperación — 30 días</li>
+          <li data-lang="en">Search and filter duplicates</li>
+          <li data-lang="es">Busca y filtra duplicados</li>
+        </ul>
+      </div>
+
+      <div class="pcard pro rv" data-label="Best Value">
+        <div class="pcard-tier" data-lang="en">Pro — Lifetime</div>
+        <div class="pcard-tier" data-lang="es">Pro — De por vida</div>
+        <div class="pcard-price">$9.99 <small data-lang="en">one-time</small><small data-lang="es">pago único</small></div>
+        <p class="pcard-desc" data-lang="en">Pay once, keep forever</p>
+        <p class="pcard-desc" data-lang="es">Paga una vez, quédatelo para siempre</p>
+        <ul class="pcard-list">
+          <li data-lang="en">Unlimited scans</li>
+          <li data-lang="es">Escaneos ilimitados</li>
+          <li data-lang="en">Scan ALL your folders</li>
+          <li data-lang="es">Escanea TODAS tus carpetas</li>
+          <li data-lang="en">Duplicates across PC and cloud</li>
+          <li data-lang="es">Duplicados en toda tu PC y nube</li>
+          <li data-lang="en">Automatic scheduled scans</li>
+          <li data-lang="es">Escaneos automáticos programados</li>
+          <li data-lang="en">Choose folders to skip</li>
+          <li data-lang="es">Elige carpetas a ignorar</li>
+          <li data-lang="en">Priority support</li>
+          <li data-lang="es">Soporte prioritario</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FINAL CTA ═══════ -->
+<section class="final-cta">
+  <div class="wrap">
+    <h2 data-lang="en">Ready to reclaim your space?</h2>
+    <h2 data-lang="es">¿Listo para recuperar tu espacio?</h2>
+    <p data-lang="en">Free from the Microsoft Store. No account, no setup, no tricks.</p>
+    <p data-lang="es">Gratis en la Microsoft Store. Sin cuenta, sin configuración, sin trucos.</p>
+    <a href="https://apps.microsoft.com/detail/9N0VZX057KW4" class="btn-big" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h6.5v6.5H1V1zm7.5 0H15v6.5H8.5V1zM1 8.5h6.5V15H1V8.5zm7.5 0H15V15H8.5V8.5z"/></svg>
+      <span data-lang="en">Download Haven Free</span>
+      <span data-lang="es">Descargar Haven Gratis</span>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-left">© 2026 Haven · Cesar Lugo Martinez</div>
+    <div class="foot-links">
+      <a href="https://cesarlugom.github.io/haven-software-legal/" target="_blank" rel="noopener" data-lang="en">Privacy Policy</a>
+      <a href="https://cesarlugom.github.io/haven-software-legal/" target="_blank" rel="noopener" data-lang="es">Política de Privacidad</a>
+      <a href="mailto:cesarlugom@gmail.com" data-lang="en">Contact</a>
+      <a href="mailto:cesarlugom@gmail.com" data-lang="es">Contacto</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════ LIGHTBOX ═══════ -->
+<div class="lb" id="lb" onclick="closeLB()">
+  <img id="lb-img" src="" alt="Screenshot preview">
+</div>
+
+<script>
+  // Reveal on scroll
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+  // Lightbox
+  function openLB(src) {
+    document.getElementById('lb-img').src = src;
+    document.getElementById('lb').classList.add('on');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLB() {
+    document.getElementById('lb').classList.remove('on');
+    document.body.style.overflow = '';
+  }
+
+  // Language toggle
+  function setLang(lang) {
+    document.body.classList.toggle('es', lang === 'es');
+    document.querySelectorAll('.lang-toggle button').forEach(b => {
+      b.classList.toggle('active', b.textContent.trim() === lang.toUpperCase());
+    });
+    localStorage.setItem('haven-lang', lang);
+  }
+
+  // Load saved language
+  const saved = localStorage.getItem('haven-lang');
+  if (saved === 'es') setLang('es');
+
+  // Detect browser language
+  if (!saved && navigator.language.startsWith('es')) setLang('es');
+</script>
+
+</body>
+</html>
