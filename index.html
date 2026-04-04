@@ -286,6 +286,38 @@
     }
     .pcard-list li::before { content: '\2713'; color: var(--accent); font-weight: 700; flex-shrink: 0; font-size: 12px; margin-top: 1px; }
 
+    /* ── PRICING BUTTONS ── */
+    .btn-pcard {
+      display: block; text-align: center; margin-top: 24px;
+      padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      text-decoration: none; font-family: inherit; transition: transform 0.2s, box-shadow 0.2s;
+      background: var(--bg-card); color: var(--text-2); border: 1px solid var(--border-hover);
+    }
+    .btn-pcard:hover { transform: translateY(-1px); color: var(--text-1); border-color: var(--text-3); }
+    .btn-pcard.pro { background: var(--accent); color: #fff; border: none; }
+    .btn-pcard.pro:hover { box-shadow: 0 4px 20px var(--accent-glow); }
+
+    /* ── FAQ ── */
+    .faq { padding: 80px 0; }
+    .faq-list { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .faq-item {
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; transition: border-color 0.3s;
+    }
+    .faq-item:hover { border-color: var(--accent-border); }
+    .faq-q {
+      width: 100%; padding: 20px 24px; background: none; border: none;
+      color: var(--text-1); font-family: inherit; font-size: 15px; font-weight: 600;
+      text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-q::after { content: '+'; font-size: 20px; color: var(--text-3); transition: transform 0.3s; }
+    .faq-item.open .faq-q::after { transform: rotate(45deg); color: var(--accent); }
+    .faq-a {
+      max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .faq-item.open .faq-a { max-height: 200px; }
+    .faq-a p { padding: 0 24px 20px; font-size: 14px; color: var(--text-2); line-height: 1.7; }
+
     /* ── CTA ── */
     .final-cta { padding: 100px 0 80px; text-align: center; }
     .final-cta h2 { font-size: clamp(26px, 3.5vw, 38px); font-weight: 700; letter-spacing: -0.025em; margin-bottom: 14px; }
@@ -369,8 +401,8 @@
     <h1 data-lang="en">Stop guessing.<br>Clean up <span class="grad">with confidence</span></h1>
     <h1 data-lang="es">Deja de adivinar.<br>Limpia <span class="grad">con confianza</span></h1>
 
-    <p class="hero-sub" data-lang="en">Haven scans your PC and cloud storage together — OneDrive, iCloud, Dropbox, Google Drive. It finds what's wasting space so you can clean up without fear of deleting something important.</p>
-    <p class="hero-sub" data-lang="es">Haven escanea tu PC y tu nube juntos — OneDrive, iCloud, Dropbox, Google Drive. Encuentra lo que ocupa espacio de más para que limpies sin miedo a borrar algo importante.</p>
+    <p class="hero-sub" data-lang="en">Haven scans your PC and cloud storage together — finds what's wasting space so you can clean up without fear.</p>
+    <p class="hero-sub" data-lang="es">Haven escanea tu PC y tu nube juntos — encuentra lo que ocupa espacio de más para que limpies sin miedo.</p>
 
     <div class="hero-buttons">
       <a href="https://apps.microsoft.com/detail/9N0VZX057KW4" class="btn-big" target="_blank" rel="noopener">
@@ -384,8 +416,8 @@
       </a>
     </div>
 
-    <p class="hero-note" data-lang="en">Windows 10 & 11 · Free: 3 trial scans · No account needed</p>
-    <p class="hero-note" data-lang="es">Windows 10 y 11 · Gratis: 3 escaneos de prueba · Sin cuenta necesaria</p>
+    <p class="hero-note" data-lang="en">Windows 10 & 11 · Free on Microsoft Store · No account needed</p>
+    <p class="hero-note" data-lang="es">Windows 10 y 11 · Gratis en Microsoft Store · Sin cuenta necesaria</p>
   </div>
 </section>
 
@@ -583,6 +615,8 @@
           <li data-lang="en">Search and filter duplicates</li>
           <li data-lang="es">Busca y filtra duplicados</li>
         </ul>
+        <a href="https://apps.microsoft.com/detail/9N0VZX057KW4" class="btn-pcard" target="_blank" rel="noopener" data-lang="en">Get Haven Free</a>
+        <a href="https://apps.microsoft.com/detail/9N0VZX057KW4" class="btn-pcard" target="_blank" rel="noopener" data-lang="es">Descargar Haven Gratis</a>
       </div>
 
       <div class="pcard pro rv" data-label="Best Value">
@@ -605,6 +639,64 @@
           <li data-lang="en">Priority support</li>
           <li data-lang="es">Soporte prioritario</li>
         </ul>
+        <a href="https://apps.microsoft.com/detail/9N0VZX057KW4" class="btn-pcard pro" target="_blank" rel="noopener" data-lang="en">Get Pro — $9.99</a>
+        <a href="https://apps.microsoft.com/detail/9N0VZX057KW4" class="btn-pcard pro" target="_blank" rel="noopener" data-lang="es">Obtener Pro — $9.99</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FAQ ═══════ -->
+<section class="faq">
+  <div class="wrap">
+    <p class="sec-label" data-lang="en">FAQ</p>
+    <p class="sec-label" data-lang="es">Preguntas frecuentes</p>
+    <h2 class="sec-title" data-lang="en">Common questions</h2>
+    <h2 class="sec-title" data-lang="es">Preguntas comunes</h2>
+
+    <div class="faq-list">
+      <div class="faq-item rv">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span data-lang="en">Does Haven permanently delete my files?</span>
+          <span data-lang="es">¿Haven elimina mis archivos permanentemente?</span>
+        </button>
+        <div class="faq-a">
+          <p data-lang="en">No. Cleaned files are moved to the Recovery Center where they're kept safe for 30 days. You can restore any file — or an entire folder — back to its original location with one click.</p>
+          <p data-lang="es">No. Los archivos limpiados se mueven al Centro de Recuperación donde se guardan por 30 días. Puedes restaurar cualquier archivo — o carpeta completa — a su ubicación original con un clic.</p>
+        </div>
+      </div>
+
+      <div class="faq-item rv">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span data-lang="en">Will it download my cloud-only files?</span>
+          <span data-lang="es">¿Descargará mis archivos que solo están en la nube?</span>
+        </button>
+        <div class="faq-a">
+          <p data-lang="en">Never. Haven detects cloud placeholders (files stored only online) and skips them entirely. Your cloud bandwidth and storage stay untouched.</p>
+          <p data-lang="es">Nunca. Haven detecta archivos placeholder (almacenados solo en línea) y los omite por completo. Tu ancho de banda y almacenamiento en la nube no se tocan.</p>
+        </div>
+      </div>
+
+      <div class="faq-item rv">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span data-lang="en">Is the Pro upgrade a subscription?</span>
+          <span data-lang="es">¿La versión Pro es una suscripción?</span>
+        </button>
+        <div class="faq-a">
+          <p data-lang="en">No. Pro is a one-time purchase of $9.99 — no subscriptions, no recurring charges. Pay once and it's yours forever, including all future updates.</p>
+          <p data-lang="es">No. Pro es un pago único de $9.99 — sin suscripciones, sin cargos recurrentes. Paga una vez y es tuyo para siempre, incluyendo todas las actualizaciones futuras.</p>
+        </div>
+      </div>
+
+      <div class="faq-item rv">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span data-lang="en">Does Haven send my data anywhere?</span>
+          <span data-lang="es">¿Haven envía mis datos a algún lado?</span>
+        </button>
+        <div class="faq-a">
+          <p data-lang="en">No. Haven makes zero network calls except for Microsoft Store license verification. No analytics, no tracking, no cloud sync. Everything runs 100% locally on your PC.</p>
+          <p data-lang="es">No. Haven no hace llamadas de red excepto para verificar la licencia de Microsoft Store. Sin análisis, sin rastreo, sin sincronización. Todo funciona 100% local en tu PC.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -670,12 +762,9 @@
     localStorage.setItem('haven-lang', lang);
   }
 
-  // Load saved language
+  // Load saved language (default is always English)
   const saved = localStorage.getItem('haven-lang');
   if (saved === 'es') setLang('es');
-
-  // Detect browser language
-  if (!saved && navigator.language.startsWith('es')) setLang('es');
 </script>
 
 </body>
