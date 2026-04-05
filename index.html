@@ -460,7 +460,7 @@
   <div class="wrap">
     <div class="screenshot-frame rv">
       <video autoplay muted loop playsinline>
-        <source src="haven-video.mp4" type="video/mp4">
+        <source src="haven-video.mp4?v=2" type="video/mp4">
       </video>
     </div>
     <div class="screenshot-grid">
@@ -810,6 +810,12 @@
       b.classList.toggle('active', b.textContent.trim() === lang.toUpperCase());
     });
     localStorage.setItem('haven-lang', lang);
+  }
+
+  // One-time reset: clear auto-detected Spanish from previous version
+  if (!localStorage.getItem('haven-lang-v2')) {
+    localStorage.removeItem('haven-lang');
+    localStorage.setItem('haven-lang-v2', '1');
   }
 
   // Load saved language (default is always English)
